@@ -1,9 +1,7 @@
-import { ASSOCIATED_TOKEN_PROGRAM_ID, Liquidity, LiquidityPoolKeysV4, MARKET_STATE_LAYOUT_V3, Market, TOKEN_PROGRAM_ID } from "@raydium-io/raydium-sdk";
+import { Liquidity, LiquidityPoolKeysV4, MARKET_STATE_LAYOUT_V3, Market } from "@raydium-io/raydium-sdk";
 import { Commitment, Connection, PublicKey } from "@solana/web3.js";
-import splToken from '@solana/spl-token';
 
 import dotenv from 'dotenv'
-import { RPC_ENDPOINT, RPC_WEBSOCKET_ENDPOINT } from "../constants";
 dotenv.config();
 
 export class PoolKeys {
@@ -13,7 +11,7 @@ export class PoolKeys {
     static SOL_DECIMALS = 9
 
     static async fetchMarketId(connection: Connection, baseMint: PublicKey, quoteMint: PublicKey, commitment: Commitment) {
-        const accounts = await connection.getProgramAccounts(
+        let accounts = await connection.getProgramAccounts(
             new PublicKey('srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX'),
             {
                 commitment,
@@ -34,6 +32,29 @@ export class PoolKeys {
                 ],
             }
         );
+        if(!accounts)
+        accounts = await connection.getProgramAccounts(
+            new PublicKey('srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX'),
+            {
+                commitment,
+                filters: [
+                    { dataSize: MARKET_STATE_LAYOUT_V3.span },
+                    {
+                        memcmp: {
+                            offset: MARKET_STATE_LAYOUT_V3.offsetOf("quoteMint"),
+                            bytes: baseMint.toBase58(),
+                        },
+                    },
+                    {
+                        memcmp: {
+                            offset: MARKET_STATE_LAYOUT_V3.offsetOf("baseMint"),
+                            bytes: quoteMint.toBase58(),
+                        },
+                    },
+                ],
+            }
+        );
+        console.log(accounts)
         return accounts.map(({ account }) => MARKET_STATE_LAYOUT_V3.decode(account.data))[0].ownAddress
     }
 
@@ -62,35 +83,36 @@ export class PoolKeys {
         return { poolInfo }
     }
 
-    static async fetchPoolKeyInfo(connection: Connection, baseMint: PublicKey, quoteMint: PublicKey): Promise<LiquidityPoolKeysV4> {
+    static async fetchPoolKeyInfo(connection: Connection, baseMint: PublicKey, quoteMint: PublicKey) {
         const marketId = await this.fetchMarketId(connection, baseMint, quoteMint, 'confirmed')
+
         const marketInfo = await this.fetchMarketInfo(connection, marketId);
-        const baseMintInfo = await connection.getParsedAccountInfo(baseMint, "confirmed") as MintInfo;
-        const baseDecimals = baseMintInfo.value.data.parsed.info.decimals
+        // const baseMintInfo = await connection.getParsedAccountInfo(baseMint, "confirmed") as MintInfo;
+        // const baseDecimals = baseMintInfo.value.data.parsed.info.decimals
 
         const V4PoolInfo = await this.generateV4PoolInfo(baseMint, quoteMint, marketId)
         const lpMintInfo = await connection.getParsedAccountInfo(V4PoolInfo.poolInfo.lpMint, "confirmed") as MintInfo;
 
         return {
             id: V4PoolInfo.poolInfo.id,
-            marketId: marketId,
             baseMint: baseMint,
             quoteMint: quoteMint,
-            baseVault: V4PoolInfo.poolInfo.baseVault,
-            quoteVault: V4PoolInfo.poolInfo.quoteVault,
             lpMint: V4PoolInfo.poolInfo.lpMint,
-            baseDecimals: baseDecimals,
-            quoteDecimals: this.SOL_DECIMALS,
+            baseDecimals: V4PoolInfo.poolInfo.baseDecimals,
+            quoteDecimals: V4PoolInfo.poolInfo.quoteDecimals,
             lpDecimals: lpMintInfo.value.data.parsed.info.decimals,
             version: 4,
             programId: new PublicKey(this.RAYDIUM_POOL_V4_PROGRAM_ID),
             authority: V4PoolInfo.poolInfo.authority,
             openOrders: V4PoolInfo.poolInfo.openOrders,
             targetOrders: V4PoolInfo.poolInfo.targetOrders,
+            baseVault: V4PoolInfo.poolInfo.baseVault,
+            quoteVault: V4PoolInfo.poolInfo.quoteVault,
             withdrawQueue: new PublicKey("11111111111111111111111111111111"),
             lpVault: new PublicKey("11111111111111111111111111111111"),
             marketVersion: 3,
             marketProgramId: new PublicKey(this.OPENBOOK_ADDRESS),
+            marketId: marketId,
             marketAuthority: Market.getAssociatedAuthority({ programId: new PublicKey(this.OPENBOOK_ADDRESS), marketId: marketId }).publicKey,
             marketBaseVault: marketInfo.baseVault,
             marketQuoteVault: marketInfo.quoteVault,
