@@ -1,6 +1,6 @@
 # Solana Volume Bot on Raydium and Meteora
 
-This bot is designed to automate the distribution of SOL to multiple wallets and execute endless buy and sell swap transactions simultaneously on the Raydium platform. It leverages Solana's blockchain technology to perform these operations efficiently.
+This bot is designed to automate the distribution of SOL to multiple wallets and execute endless buy and sell swap transactions simultaneously on the Raydium and Meteora platforms. It leverages Solana's blockchain technology to perform these operations efficiently.
 
 ## Features
 
@@ -8,7 +8,7 @@ This bot is designed to automate the distribution of SOL to multiple wallets and
 - **Endless Buy and Sell Swaps**: Performs simultaneous buy and sell transactions.
 - **Configurable Parameters**: Allows customization of buy amounts, intervals, distribution settings, and more.
 - **Massive Buy Mode**: Enables the configuration of multiple wallets for large-scale buy operations.
-- **Sell Mode**: Gradually sells all tokens in sub-wallets through small transactions.
+- **Sell Mode**: Gradually sell all sub-wallets tokens through small transactions.
 - **Token Pair Settings**: Configurable token mint and pool ID for swap operations.
 - **Logging**: Supports adjustable logging levels for better monitoring and debugging.
 
@@ -60,8 +60,8 @@ LOG_LEVEL=info               # Logging level (info, debug, error)
 ## Usage
 1. Clone the repository
 ```
-git clone https://github.com/poseisol/raydium-volume-bot
-cd raydium-volume-bot
+git clone https://github.com/justshiftjk/Solana-Volume-Bot
+cd Solana-Volume-Bot
 ```
 2. Install dependencies
 ```
@@ -69,7 +69,7 @@ npm install
 ```
 3. Configure the environment variables
 
-Rename the .env.copy file to .env and set RPC and WSS, main keypair's secret key, and jito auth keypair.
+Rename the .env.copy file to .env and set RPC and WSS, main keypair's secret key, and Jito auth keypair.
 
 4. Run the bot
 
@@ -79,6 +79,7 @@ npm start
 
 ## Contact
 
-### Please fork to use it and follow me on github.
+If you have any questions or want a more customized app for specific use cases, don't hesitate to get in touch with me to the contacts below.
 
-### If you want more customized app, please contact [@dave](https://t.me/davevasu) in Telegram and [!Myrade](https://discordapp.com/users/197424152603394049) in Discord
+- E-Mail: adamglab0731.pl@gmail.com
+- Telegram: [@bettyjk_0915](https://t.me/bettyjk_0915)
