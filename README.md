@@ -1,16 +1,29 @@
-# Solana Volume Bot on Raydium and Meteora
+# Solana Volume Bot for Raydium and Meteora
 
-This bot is designed to automate the distribution of SOL to multiple wallets and execute endless buy and sell swap transactions simultaneously on the Raydium and Meteora platforms. It leverages Solana's blockchain technology to perform these operations efficiently.
+The **Solana Volume Bot** is a sophisticated automation tool designed to facilitate the distribution of SOL across multiple wallets and execute concurrent buy and sell swap transactions on the **Raydium** and **Meteora** decentralized exchanges. By leveraging the power of the **Solana blockchain**, this bot enables high-efficiency operations, ensuring fast and seamless transactions.
 
 ## Features
 
-- **Automated SOL Distribution**: Distributes SOL to new wallets.
-- **Endless Buy and Sell Swaps**: Performs simultaneous buy and sell transactions.
-- **Configurable Parameters**: Allows customization of buy amounts, intervals, distribution settings, and more.
-- **Massive Buy Mode**: Enables the configuration of multiple wallets for large-scale buy operations.
-- **Sell Mode**: Gradually sell all sub-wallets tokens through small transactions.
-- **Token Pair Settings**: Configurable token mint and pool ID for swap operations.
-- **Logging**: Supports adjustable logging levels for better monitoring and debugging.
+- **Automated SOL Distribution**  
+  Automates the process of distributing SOL to newly created wallets for efficient fund allocation.
+  
+- **Endless Buy and Sell Swaps**  
+  Executes buy and sell swap transactions concurrently on Raydium and Meteora, ensuring continuous trading activity.
+  
+- **Configurable Parameters**  
+  Customize transaction settings including buy amounts, intervals, distribution configurations, and more, to tailor the bot’s performance to your specific needs.
+  
+- **Massive Buy Mode**  
+  Configures multiple wallets to carry out large-scale buy operations, increasing trading volume and flexibility.
+  
+- **Sell Mode**  
+  Gradually sells tokens from all sub-wallets through incremental transactions to avoid large market impacts.
+  
+- **Token Pair Settings**  
+  Set token mints and pool IDs for swap operations, providing full control over which assets are traded.
+  
+- **Logging and Monitoring**  
+  Provides adjustable logging levels for improved monitoring, debugging, and performance tracking during operation.
 
 ## Environment Variables
 
