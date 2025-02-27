@@ -2,27 +2,27 @@
 
 The **Solana Volume Bot** is a sophisticated automation tool designed to facilitate the distribution of SOL across multiple wallets and execute concurrent buy and sell swap transactions on the **Raydium** and **Meteora** decentralized exchanges. By leveraging the power of the **Solana blockchain**, this bot enables high-efficiency operations, ensuring fast and seamless transactions.
 
-## Features
+## 🔥Features
 
-- **Automated SOL Distribution**  
+⚡**Automated SOL Distribution**  
   Automates the process of distributing SOL to newly created wallets for efficient fund allocation.
   
-- **Endless Buy and Sell Swaps**  
+🎯**Endless Buy and Sell Swaps**  
   Executes buy and sell swap transactions concurrently on Raydium and Meteora, ensuring continuous trading activity.
   
-- **Configurable Parameters**  
+🔍**Configurable Parameters**  
   Customize transaction settings including buy amounts, intervals, distribution configurations, and more, to tailor the bot’s performance to your specific needs.
   
-- **Massive Buy Mode**  
+🚀**Massive Buy Mode**  
   Configures multiple wallets to carry out large-scale buy operations, increasing trading volume and flexibility.
   
-- **Sell Mode**  
+🛒**Sell Mode**  
   Gradually sells tokens from all sub-wallets through incremental transactions to avoid large market impacts.
   
-- **Token Pair Settings**  
+⚙️**Token Pair Settings**  
   Set token mints and pool IDs for swap operations, providing full control over which assets are traded.
   
-- **Logging and Monitoring**  
+🖥️**Logging and Monitoring**  
   Provides adjustable logging levels for improved monitoring, debugging, and performance tracking during operation.
 
 ## Environment Variables
