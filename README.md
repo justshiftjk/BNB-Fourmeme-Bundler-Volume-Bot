@@ -479,13 +479,3 @@ For inquiries, custom integrations, or tailored solutions, reach out via:
 💬 **Telegram**: [@bettyjk_0915](https://t.me/bettyjk_0915)
 
 ---
-
-<div align="center">
-
-**Built for four.meme platform on BNB Chain 🚀**
-
-Made with ❤️ by the community
-
-[⬆ Back to Top](#fourmeme-bnb-chain-volume-bot-)
-
-</div>
