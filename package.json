@@ -1,36 +1,39 @@
 {
-  "name": "fourmeme-bnb-volume-bot",
+  "name": "4meme-trading-bot",
   "version": "1.0.0",
-  "description": "BNB Chain volume bot for four.meme platform",
-  "main": "dist/index.js",
+  "description": "Four.meme token trading bot with buy/sell functionality",
+  "main": "dist/trader.js",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts",
-    "create": "ts-node src/create.ts",
-    "volume": "ts-node src/volume.ts"
+    "dev": "ts-node src/trader.ts",
+    "start": "ts-node src/volume-bot.ts",
+    "gather": "ts-node src/gather.ts",
+    "server": "ts-node src/server.ts",
+    "ui": "ts-node src/server.ts"
   },
   "keywords": [
-    "bnb",
+    "ethereum",
     "bsc",
-    "four.meme",
-    "volume-bot",
-    "crypto"
+    "trading",
+    "bot",
+    "four.meme"
   ],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@pancakeswap/sdk": "^5.7.0",
-    "bignumber.js": "^9.1.2",
-    "dotenv": "^16.4.5",
-    "ethers": "^6.11.1",
-    "web3": "^4.6.0",
-    "axios": "^1.6.7",
-    "chalk": "^4.1.2"
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "ethers": "^6.8.1",
+    "express": "^4.18.2",
+    "fs-extra": "^11.2.0",
+    "helmet": "^7.1.0"
   },
   "devDependencies": {
-    "@types/node": "^20.11.24",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "@types/cors": "^2.8.16",
+    "@types/express": "^4.17.21",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.8.10",
+    "@validate-pubkey/hex": "^1.0.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
   }
 }

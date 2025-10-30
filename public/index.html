@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4Meme Trading Bot Control Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #000000;
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-bar {
+            background: #1a1a1a;
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ef4444;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+
+        .status-dot.active {
+            background: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.7;
+                transform: scale(1.1);
+            }
+        }
+
+        .card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+        }
+
+        .card h2 {
+            color: #ffffff;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #888;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            padding: 12px 15px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #0a0a0a;
+            color: #ffffff;
+        }
+
+        .form-group input::placeholder {
+            color: #666;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #555;
+            box-shadow: 0 0 0 3px rgba(85, 85, 85, 0.2);
+            background: #151515;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.6);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+            font-weight: 500;
+            display: none;
+            border: 2px solid;
+        }
+
+        .message.success {
+            background: #1a3a1a;
+            color: #4ade80;
+            border-color: #10b981;
+        }
+
+        .message.error {
+            background: #3a1a1a;
+            color: #f87171;
+            border-color: #ef4444;
+        }
+
+        .section-divider {
+            height: 1px;
+            background: #333;
+            margin: 25px 0;
+        }
+
+        h3 {
+            margin: 20px 0 15px 0;
+            color: #888 !important;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 4Meme Trading Bot</h1>
+            <p>Control Panel</p>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-indicator">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">Checking status...</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Configuration</h2>
+            <div id="configForm">
+                <h3 style="margin: 20px 0 15px 0; color: #6b7280;">⚙️ Basic Settings</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label>Private Key</label>
+                        <input type="password" id="PRIVATE_KEY" placeholder="0x..." onfocus="this.type='text'"
+                            onblur="this.type='password'">
+                    </div>
+                    <div class="form-group">
+                        <label>Token Address</label>
+                        <input type="text" id="TOKEN_ADDRESS" placeholder="0x...">
+                    </div>
+                    <div class="form-group">
+                        <label>RPC URL</label>
+                        <input type="text" id="RPC_URL" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>Total BNB</label>
+                        <input type="number" id="TOTAL_BNB" step="0.01" placeholder="18.0">
+                    </div>
+                    <div class="form-group">
+                        <label>Total Number of Wallets</label>
+                        <input type="number" id="TOTAL_NUM_WALLETS" placeholder="50">
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <h3 style="margin: 20px 0 15px 0; color: #6b7280;">💰 Deposit Settings</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label>Min Deposit BNB</label>
+                        <input type="number" id="MIN_DEPOSIT_BNB" step="0.001" placeholder="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Deposit BNB</label>
+                        <input type="number" id="MAX_DEPOSIT_BNB" step="0.001" placeholder="0.02">
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <h3 style="margin: 20px 0 15px 0; color: #6b7280;">📈 Buy Settings</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label>Min Buy Num Per Cycle</label>
+                        <input type="number" id="MIN_BUY_NUM_PER_CYCLE" placeholder="3">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Buy Num Per Cycle</label>
+                        <input type="number" id="MAX_BUY_NUM_PER_CYCLE" placeholder="5">
+                    </div>
+                    <div class="form-group">
+                        <label>Min Buy Percent BNB</label>
+                        <input type="number" id="MIN_BUY_PERCENT_BNB" placeholder="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Buy Percent BNB</label>
+                        <input type="number" id="MAX_BUY_PERCENT_BNB" placeholder="100">
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <h3 style="margin: 20px 0 15px 0; color: #6b7280;">📉 Sell Settings</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label>Min Percent Sell Wallets</label>
+                        <input type="number" id="MIN_PERCENT_SELL" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Percent Sell Wallets</label>
+                        <input type="number" id="MAX_PERCENT_SELL" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Min Percent Sell Amount After Buy</label>
+                        <input type="number" id="MIN_PERCENT_SELL_AMOUNT_AFTER_BUY" placeholder="50">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Percent Sell Amount After Buy</label>
+                        <input type="number" id="MAX_PERCENT_SELL_AMOUNT_AFTER_BUY" placeholder="80">
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <h3 style="margin: 20px 0 15px 0; color: #6b7280;">⏱️ Timing Settings</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label>Min Per Cycle Time (ms)</label>
+                        <input type="number" id="MIN_PER_CYCLE_TIME" placeholder="5000">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Per Cycle Time (ms)</label>
+                        <input type="number" id="MAX_PER_CYCLE_TIME" placeholder="10000">
+                    </div>
+                    <div class="form-group">
+                        <label>Min Delay Buy (ms)</label>
+                        <input type="number" id="MIN_DELAY_BUY" placeholder="2000">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Delay Buy (ms)</label>
+                        <input type="number" id="MAX_DELAY_BUY" placeholder="8000">
+                    </div>
+                    <div class="form-group">
+                        <label>Min Delay Sell (ms)</label>
+                        <input type="number" id="MIN_DELAY_SELL" placeholder="4000">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Delay Sell (ms)</label>
+                        <input type="number" id="MAX_DELAY_SELL" placeholder="12000">
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <h3 style="margin: 20px 0 15px 0; color: #6b7280;">🔧 Other Settings</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label>Gas Buffer BNB</label>
+                        <input type="number" id="GAS_BUFFER_BNB" step="0.001" placeholder="0.001">
+                    </div>
+                    <div class="form-group">
+                        <label>Cycle Limit</label>
+                        <input type="number" id="CYCLE_LIMIT" placeholder="3">
+                    </div>
+                    <div class="form-group">
+                        <label>Use Pancake After Migration</label>
+                        <input type="text" id="USE_PANCAKE_AFTER_MIGRATION" placeholder="false">
+                    </div>
+                    <div class="form-group">
+                        <label>Stealth Mode</label>
+                        <input type="text" id="STEALTH_MODE" placeholder="false">
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group" style="margin-top: 25px;">
+                <button class="btn-primary" onclick="saveConfig()">💾 Save Configuration</button>
+            </div>
+
+            <div id="message" class="message"></div>
+        </div>
+
+        <div class="card">
+            <h2>Bot Control</h2>
+            <div class="button-group">
+                <button class="btn-success" id="startBtn" onclick="startBot()">▶ Start Bot</button>
+                <button class="btn-danger" id="stopBtn" onclick="stopBot()">⏹ Stop Bot</button>
+                <button class="btn-primary" id="gatherBtn" onclick="gather()">📥 Gather</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📋 Bot Logs</h2>
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+                <button class="btn-primary" onclick="clearLogs()" style="min-width: auto; padding: 8px 20px;">Clear
+                    Logs</button>
+            </div>
+            <div id="logsContainer"
+                style="background: #0a0a0a; border: 1px solid #333; border-radius: 8px; padding: 15px; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 0.85rem; color: #888;">
+                <div style="color: #666;">No logs yet...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load configuration on page load
+        async function loadConfig() {
+            try {
+                console.log('Loading config...');
+                const res = await fetch('/api/env');
+                const env = await res.json();
+                console.log('Received env:', env);
+                Object.keys(env).forEach(key => {
+                    const input = document.getElementById(key);
+                    if (input) {
+                        if (env[key] !== undefined && env[key] !== null && env[key] !== '') {
+                            console.log(`Setting ${key} to:`, env[key]);
+                            input.value = env[key];
+                        } else {
+                            // Set placeholder with current value if exists
+                            input.placeholder = input.value || input.placeholder;
+                        }
+                    }
+                });
+                console.log('Config loaded');
+            } catch (error) {
+                console.error('Failed to load config:', error);
+            }
+        }
+
+        // Save configuration
+        async function saveConfig() {
+            const inputs = document.querySelectorAll('#configForm input');
+            const data = {};
+            inputs.forEach(input => {
+                if (input.value) {
+                    data[input.id] = input.value;
+                }
+            });
+
+            try {
+                const res = await fetch('/api/env', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                showMessage(result.success ? 'Configuration saved successfully!' : result.error, result.success);
+            } catch (error) {
+                showMessage('Failed to save configuration', false);
+            }
+        }
+
+        // Start bot
+        async function startBot() {
+            try {
+                const res = await fetch('/api/start', { method: 'POST' });
+                const result = await res.json();
+                showMessage(result.message || result.error, result.success);
+                if (result.success) {
+                    setTimeout(checkStatus, 1000);
+                }
+            } catch (error) {
+                showMessage('Failed to start bot', false);
+            }
+        }
+
+        // Stop bot
+        async function stopBot() {
+            try {
+                const res = await fetch('/api/stop', { method: 'POST' });
+                const result = await res.json();
+                showMessage(result.message || result.error, result.success);
+                if (result.success) {
+                    setTimeout(checkStatus, 1000);
+                }
+            } catch (error) {
+                showMessage('Failed to stop bot', false);
+            }
+        }
+
+        // Gather
+        async function gather() {
+            try {
+                const res = await fetch('/api/gather', { method: 'POST' });
+                const result = await res.json();
+                showMessage(result.message || result.error, result.success);
+            } catch (error) {
+                showMessage('Failed to start gather', false);
+            }
+        }
+
+        // Check status
+        async function checkStatus() {
+            try {
+                const res = await fetch('/api/status');
+                const status = await res.json();
+                const statusDot = document.getElementById('statusDot');
+                const statusText = document.getElementById('statusText');
+
+                if (status.running) {
+                    statusDot.classList.add('active');
+                    statusText.textContent = 'Bot is running';
+                } else {
+                    statusDot.classList.remove('active');
+                    statusText.textContent = 'Bot is stopped';
+                }
+            } catch (error) {
+                console.error('Failed to check status:', error);
+            }
+        }
+
+        // Show message
+        function showMessage(text, isSuccess) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = 'message ' + (isSuccess ? 'success' : 'error');
+            msg.style.display = 'block';
+            setTimeout(() => {
+                msg.style.display = 'none';
+            }, 3000);
+        }
+
+        // Load logs
+        async function loadLogs() {
+            try {
+                const res = await fetch('/api/logs');
+                const data = await res.json();
+                const container = document.getElementById('logsContainer');
+
+                if (data.logs && data.logs.length > 0) {
+                    container.innerHTML = data.logs.map(log => {
+                        const isError = log.includes('ERROR');
+                        const color = isError ? '#f87171' : '#888';
+                        return `<div style="color: ${color}; margin-bottom: 5px;">${escapeHtml(log)}</div>`;
+                    }).join('');
+                    container.scrollTop = container.scrollHeight;
+                } else {
+                    container.innerHTML = '<div style="color: #666;">No logs yet...</div>';
+                }
+            } catch (error) {
+                console.error('Failed to load logs:', error);
+            }
+        }
+
+        // Clear logs
+        async function clearLogs() {
+            try {
+                const res = await fetch('/api/logs/clear', { method: 'POST' });
+                if (res.ok) {
+                    loadLogs();
+                }
+            } catch (error) {
+                console.error('Failed to clear logs:', error);
+            }
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initial load when DOM is ready
+        document.addEventListener('DOMContentLoaded', function () {
+            loadConfig();
+            checkStatus();
+            loadLogs();
+            setInterval(checkStatus, 5000); // Check status every 5 seconds
+            setInterval(loadLogs, 2000); // Load logs every 2 seconds
+        });
+    </script>
+</body>
+
+</html>
