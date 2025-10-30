@@ -1,6 +1,7 @@
 # Four.meme Volume Bot (Bypassing Bubble Map detection)
 
 A trading bot platform for four.meme and Pancakeswap tokens with automatic migration detection, dual exchange support, and volume trading capabilities with stealth mode.
+
 <img width="1374" height="850" alt="image" src="https://github.com/user-attachments/assets/140a0758-f724-425b-bec1-8bc275f213ff" />
 <img width="1375" height="830" alt="image (1)" src="https://github.com/user-attachments/assets/e7703f2a-15a0-46e4-83ea-d679e29c9816" />
 
