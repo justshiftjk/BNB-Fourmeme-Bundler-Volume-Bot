@@ -1,6 +1,6 @@
 # Four.meme Volume Bot (Bypassing Bubble Map detection)
 
-A TypeScript trading bot for four.meme and Pancakeswap tokens with automatic migration detection, dual exchange support, and volume trading capabilities with stealth mode.
+A trading bot platform for four.meme and Pancakeswap tokens with automatic migration detection, dual exchange support, and volume trading capabilities with stealth mode.
 
 ## Features
 
@@ -310,6 +310,4 @@ npx tsc --noEmit
 For inquiries, custom integrations, or tailored solutions, reach out via:  
 
 💬 **Telegram**: [@bettyjk_0915](https://t.me/bettyjk_0915)
-
----
 
