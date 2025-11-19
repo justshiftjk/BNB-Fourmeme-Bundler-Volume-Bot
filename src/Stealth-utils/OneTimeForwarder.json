@@ -2,9 +2,21 @@
   "_format": "hh-sol-artifact-1",
   "contractName": "OneTimeForwarder",
   "sourceName": "contracts/StealthFund.sol",
-  "abi": [],
-  "bytecode": "",
-  "deployedBytecode": "",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address payable",
+          "name": "recipient",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "constructor"
+    }
+  ],
+  "bytecode": "0x6080601f60d438819003918201601f19168301916001600160401b0383118484101760bd5780849260209460405283398101031260b857516001600160a01b03811680820360b857156082573415605257ff5b60405162461bcd60e51b81526020600482015260086024820152676e6f2076616c756560c01b6044820152606490fd5b60405162461bcd60e51b815260206004820152600e60248201526d1e995c9bc81c9958da5c1a595b9d60921b6044820152606490fd5b600080fd5b634e487b7160e01b600052604160045260246000fdfe",
+  "deployedBytecode": "0x600080fdfea164736f6c634300081c000a",
   "linkReferences": {},
   "deployedLinkReferences": {}
 }

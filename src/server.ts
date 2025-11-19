@@ -58,8 +58,9 @@ app.get('/api/env', async (req, res) => {
             console.log("PRIVATE_KEY is not set");
             return res.status(400).json({ error: 'PRIVATE_KEY is not set' });
         }
-        if (!envData.TOKEN_ADDRESS || await validatePubkey(envData.TOKEN_ADDRESS) === false) {
-            console.log("TOKEN_ADDRESS is not set or invalid");
+        // Token address is optional for distribution phase
+        if (envData.TOKEN_ADDRESS && await validatePubkey(envData.TOKEN_ADDRESS) === false) {
+            console.log("TOKEN_ADDRESS is invalid");
             return res.status(400).json({ error: 'Invalid token address' });
         }
         res.json({
@@ -115,12 +116,14 @@ app.post('/api/env', async (req, res) => {
             return res.status(400).json({ error: 'PRIVATE_KEY is not set' });
         }
 
+        // Token address is optional for distribution phase
         const tokenAddress = envContent.includes('TOKEN_ADDRESS=') ? envContent.split('TOKEN_ADDRESS=')[1].trim() : '';
-        const tokenAddressTrimmed = tokenAddress.trim().slice(0, 42);
-        const validate = await validatePubkey(tokenAddressTrimmed);
-        if (await validatePubkey(tokenAddressTrimmed) === false) {
-            console.log("TOKEN_ADDRESS is not set or invalid");
-            return res.status(400).json({ error: 'TOKEN_ADDRESS is not set or invalid' });
+        if (tokenAddress) {
+            const tokenAddressTrimmed = tokenAddress.trim().slice(0, 42);
+            if (await validatePubkey(tokenAddressTrimmed) === false) {
+                console.log("TOKEN_ADDRESS is invalid");
+                return res.status(400).json({ error: 'TOKEN_ADDRESS is invalid' });
+            }
         }
         fs.writeFileSync(envPath, envContent, 'utf8');
         res.json({ success: true, message: 'Env updated successfully' });
@@ -129,10 +132,10 @@ app.post('/api/env', async (req, res) => {
     }
 });
 
-// Start bot
+// Start bot (Phase 2 - Trading)
 app.post('/api/start', async (req, res) => {
     try {
-        console.log('Starting bot...');
+        console.log('Starting bot for trading...');
         // Check if already running by looking for actual node/ts-node processes with volume-bot
         exec('ps aux | grep "ts-node.*volume-bot" | grep -v grep | grep -v "ps aux"', (err, stdout) => {
             const isRunning = stdout && stdout.trim().length > 0;
@@ -140,9 +143,10 @@ app.post('/api/start', async (req, res) => {
             if (!isRunning) {
                 // No process found, so we can start
                 console.log('No existing bot process found, starting...');
-                addBotLog('Bot starting...');
-                // Start bot in background
-                const child = exec('npm run start', { cwd: process.cwd() });
+                addBotLog('Bot starting for trading...');
+                // Start bot in background - use --trading flag to explicitly run trading mode
+                // This ensures UI buttons control behavior via flags, ignoring DISTRIBUTE_ONLY from .env
+                const child = exec('ts-node src/volume-bot.ts --trading', { cwd: process.cwd() });
                 child.stdout?.on('data', (data) => {
                     const logData = data.toString();
                     console.log('Bot:', logData);
@@ -156,7 +160,7 @@ app.post('/api/start', async (req, res) => {
                 child.on('exit', (code) => {
                     addBotLog(`Bot exited with code ${code}`);
                 });
-                res.json({ success: true, message: 'Bot started' });
+                res.json({ success: true, message: 'Bot started for trading' });
             } else {
                 // Process found, already running
                 console.log('Bot is already running:', stdout.trim());
@@ -169,7 +173,45 @@ app.post('/api/start', async (req, res) => {
     }
 });
 
-// Stop bot
+// Distribute BNB only (Phase 1)
+app.post('/api/distribute', async (req, res) => {
+    try {
+        console.log('Starting BNB distribution...');
+        // Check if already running
+        exec('ps aux | grep "ts-node.*volume-bot" | grep -v grep | grep -v "ps aux"', (err, stdout) => {
+            const isRunning = stdout && stdout.trim().length > 0;
+
+            if (!isRunning) {
+                console.log('Starting distribution...');
+                addBotLog('Starting BNB distribution...');
+                // Start bot in distribution-only mode using command line argument
+                const child = exec('ts-node src/volume-bot.ts --distribute', { cwd: process.cwd() });
+                child.stdout?.on('data', (data) => {
+                    const logData = data.toString();
+                    console.log('Distribution:', logData);
+                    addBotLog(logData);
+                });
+                child.stderr?.on('data', (data) => {
+                    const logData = data.toString();
+                    console.error('Distribution error:', logData);
+                    addBotLog(`ERROR: ${logData}`);
+                });
+                child.on('exit', (code) => {
+                    addBotLog(`Distribution completed with code ${code}`);
+                });
+                res.json({ success: true, message: 'Distribution started' });
+            } else {
+                console.log('Bot is already running:', stdout.trim());
+                res.status(400).json({ error: 'Bot is already running' });
+            }
+        });
+    } catch (error) {
+        console.error('Distribution error:', error);
+        res.status(500).json({ error: 'Failed to start distribution' });
+    }
+});
+
+// Stop bot (graceful shutdown)
 app.post('/api/stop', async (req, res) => {
     try {
         // Check if running
@@ -182,13 +224,20 @@ app.post('/api/stop', async (req, res) => {
         }
 
         try {
-            await execAsync('pkill -f "ts-node.*volume-bot"');
-            addBotLog('Bot stopped');
-            return res.json({ success: true, message: 'Bot stopped' });
+            // Send SIGTERM for graceful shutdown (allows bot to save state)
+            await execAsync('pkill -SIGTERM -f "ts-node.*volume-bot"');
+            addBotLog('Bot stop signal sent (graceful shutdown)');
+            return res.json({ success: true, message: 'Bot stop signal sent. State will be saved.' });
         } catch (e) {
-            // Even if pkill errors, treat as stopped
-            addBotLog('Bot stop attempted (no process matched)');
-            return res.json({ success: true, message: 'Bot stopped' });
+            // Even if pkill errors, try pkill without signal
+            try {
+                await execAsync('pkill -f "ts-node.*volume-bot"');
+                addBotLog('Bot stopped');
+                return res.json({ success: true, message: 'Bot stopped' });
+            } catch (e2) {
+                addBotLog('Bot stop attempted (no process matched)');
+                return res.json({ success: true, message: 'Bot stopped' });
+            }
         }
     } catch (error) {
         res.status(500).json({ error: 'Failed to stop bot' });
@@ -198,16 +247,38 @@ app.post('/api/stop', async (req, res) => {
 // Gather
 app.post('/api/gather', async (req, res) => {
     try {
-        const child = exec('npm run gather');
-        child.stdout?.on('data', (data) => console.log(data));
-        child.stderr?.on('data', (data) => console.error(data));
-        child.on('close', (code) => {
-            if (code === 0) {
-                console.log('Gather completed');
+        // Check if already running
+        exec('ps aux | grep "ts-node.*gather" | grep -v grep | grep -v "ps aux"', (err, stdout) => {
+            const isRunning = stdout && stdout.trim().length > 0;
+
+            if (!isRunning) {
+                console.log('Starting gather...');
+                addBotLog('Starting gather process...');
+                const child = exec('npm run gather', { cwd: process.cwd() });
+                child.stdout?.on('data', (data) => {
+                    const logData = data.toString();
+                    console.log('Gather:', logData);
+                    addBotLog(logData);
+                });
+                child.stderr?.on('data', (data) => {
+                    const logData = data.toString();
+                    console.error('Gather error:', logData);
+                    addBotLog(`ERROR: ${logData}`);
+                });
+                child.on('close', (code) => {
+                    const message = code === 0 ? 'Gather completed successfully' : `Gather completed with code ${code}`;
+                    console.log(message);
+                    addBotLog(message);
+                });
+                res.json({ success: true, message: 'Gather started' });
+            } else {
+                console.log('Gather is already running:', stdout.trim());
+                res.status(400).json({ error: 'Gather is already running' });
             }
         });
-        res.json({ success: true, message: 'Gather started' });
     } catch (error) {
+        console.error('Gather error:', error);
+        addBotLog(`Failed to start gather: ${error}`);
         res.status(500).json({ error: 'Failed to start gather' });
     }
 });
@@ -219,6 +290,22 @@ app.get('/api/status', async (req, res) => {
         res.json({ running: stdout.trim().length > 0 });
     } catch (error) {
         res.json({ running: false });
+    }
+});
+
+// Get bot state (for resuming cycles)
+app.get('/api/state', async (req, res) => {
+    try {
+        const stateFile = 'bot-state.json';
+        if (!fs.existsSync(stateFile)) {
+            return res.json({ state: null });
+        }
+        const stateContent = fs.readFileSync(stateFile, 'utf8');
+        const state = JSON.parse(stateContent);
+        res.json({ state });
+    } catch (error) {
+        console.error('Failed to load bot state:', error);
+        res.json({ state: null });
     }
 });
 
