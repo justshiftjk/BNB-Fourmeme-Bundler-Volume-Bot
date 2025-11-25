@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import * as fs from 'fs';
 import * as dotenv from 'dotenv';
 import FourMemeTrader from './trader';
-import { validatePubkey } from '@validate-pubkey/hex';
+import { isAddress } from '@validate-ethereum-address/core';
 dotenv.config();
 
 const WALLET_LOG_FILE = 'wallets.json';
@@ -28,7 +28,7 @@ interface WalletLog {
 async function main() {
     const provider = new ethers.JsonRpcProvider(RPC_URL);
     const mainWallet = new ethers.Wallet(MAIN_WALLET_PK, provider);
-    if (await validatePubkey(TOKEN_ADDRESS) === false) {
+    if (isAddress(TOKEN_ADDRESS, false) === false) {
         console.log('Invalid token address');
         return;
     }

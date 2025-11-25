@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { validatePubkey } from '@validate-pubkey/hex';
+import { isAddress } from '@validate-ethereum-address/core';
 
 const execAsync = promisify(exec);
 const app = express();
@@ -59,7 +59,7 @@ app.get('/api/env', async (req, res) => {
             return res.status(400).json({ error: 'PRIVATE_KEY is not set' });
         }
         // Token address is optional for distribution phase
-        if (envData.TOKEN_ADDRESS && await validatePubkey(envData.TOKEN_ADDRESS) === false) {
+        if (envData.TOKEN_ADDRESS && isAddress(envData.TOKEN_ADDRESS, false) === false) {
             console.log("TOKEN_ADDRESS is invalid");
             return res.status(400).json({ error: 'Invalid token address' });
         }
@@ -120,7 +120,7 @@ app.post('/api/env', async (req, res) => {
         const tokenAddress = envContent.includes('TOKEN_ADDRESS=') ? envContent.split('TOKEN_ADDRESS=')[1].trim() : '';
         if (tokenAddress) {
             const tokenAddressTrimmed = tokenAddress.trim().slice(0, 42);
-            if (await validatePubkey(tokenAddressTrimmed) === false) {
+            if (isAddress(tokenAddressTrimmed, false) === false) {
                 console.log("TOKEN_ADDRESS is invalid");
                 return res.status(400).json({ error: 'TOKEN_ADDRESS is invalid' });
             }

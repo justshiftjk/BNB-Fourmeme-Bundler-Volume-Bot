@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import FourMemeTrader from './trader';
 import StealthFundABI from './Stealth-utils/StealthFund.json';
-import { validatePubkey } from '@validate-pubkey/hex';
+import { isAddress } from '@validate-ethereum-address/core';
 
 dotenv.config();
 
@@ -723,7 +723,7 @@ if (require.main === module) {
 
         // Token address is optional for distribution phase
         const tokenAddress = process.env.TOKEN_ADDRESS;
-        if (!distributionOnly && (!tokenAddress || await validatePubkey(tokenAddress) === false)) {
+        if (!distributionOnly && (!tokenAddress || isAddress(tokenAddress, false) === false)) {
             console.error("TOKEN_ADDRESS is not set or invalid (required for trading)");
             process.exit(1);
         }
